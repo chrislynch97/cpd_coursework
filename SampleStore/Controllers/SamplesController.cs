@@ -79,6 +79,54 @@ namespace SampleStore.Controllers
             }
         }
 
+        // POST: api/Samples
+        /// <summary>
+        /// Create a new sample
+        /// </summary>
+        /// <param name="sample"></param>
+        /// <returns></returns>
+        [ResponseType(typeof(Sample))]
+        public IHttpActionResult PostSamplel(Sample sample)
+        {
+            SampleEntity sampleEntity = new SampleEntity()
+            {
+                RowKey = getNewMaxRowKeyValue(),
+                PartitionKey = partitionName,
+                Title = sample.Title,
+                Artist = sample.Artist,
+                CreatedDate = DateTime.Now,
+                Mp3Blob = null,
+                SampleMp3Blob = null,
+                SampleMp3URL = sample.SampleMp3URL,
+                SampleDate = null
+            };
+
+            // Create the TableOperation that inserts the sample entity.
+            var insertOperation = TableOperation.Insert(sampleEntity);
+
+            // Execute the insert operation.
+            table.Execute(insertOperation);
+
+            return CreatedAtRoute("DefaultApi", new { id = sampleEntity.RowKey }, sampleEntity);
+        }
+
+        // TODO PUT - UPDATE
+
+        // TODO DELETE
+
+        private String getNewMaxRowKeyValue()
+        {
+            TableQuery<SampleEntity> query = new TableQuery<SampleEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionName));
+
+            int maxRowKeyValue = 0;
+            foreach (SampleEntity entity in table.ExecuteQuery(query))
+            {
+                int entityRowKeyValue = Int32.Parse(entity.RowKey);
+                if (entityRowKeyValue > maxRowKeyValue) maxRowKeyValue = entityRowKeyValue;
+            }
+            maxRowKeyValue++;
+            return maxRowKeyValue.ToString();
+        }
 
     }
 }

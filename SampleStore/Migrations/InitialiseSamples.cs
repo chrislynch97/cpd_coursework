@@ -115,7 +115,6 @@ namespace SampleStore.Migrations
                 batchOperation.Insert(sample5);
                 batchOperation.Insert(sample6);
                 batchOperation.Insert(sample7);
-                batchOperation.Insert(sample8);
 
                 // Execute the batch operation.
                 table.ExecuteBatch(batchOperation);
