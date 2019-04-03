@@ -110,7 +110,44 @@ namespace SampleStore.Controllers
             return CreatedAtRoute("DefaultApi", new { id = sampleEntity.RowKey }, sampleEntity);
         }
 
-        // TODO PUT - UPDATE
+        // PUT: api/Samples/5
+        /// <summary>
+        /// Update a sample
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="sample"></param>
+        /// <returns></returns>
+        [ResponseType(typeof(void))]
+        public IHttpActionResult PutSample(string id, Sample sample)
+        {
+            if (id != sample.SampleID)
+            {
+                return BadRequest();
+            }
+
+            // Create a retrieve operation that takes a sample entity.
+            TableOperation retrieveOperation = TableOperation.Retrieve<SampleEntity>(partitionName, id);
+
+            // Execute the operation.
+            TableResult retrievedResult = table.Execute(retrieveOperation);
+
+            // Assign the result to a SampleEntity object.
+            SampleEntity updateEntity = (SampleEntity)retrievedResult.Result;
+
+            updateEntity.Title = sample.Title;
+            updateEntity.Artist = sample.Artist;
+            updateEntity.SampleMp3URL = sample.SampleMp3URL;
+
+            // Create the TableOperation that inserts the sample entity.
+            // Note semantics of InsertOrReplace() which are consistent with PUT
+            // See: https://stackoverflow.com/questions/14685907/difference-between-insert-or-merge-entity-and-insert-or-replace-entity
+            var updateOperation = TableOperation.InsertOrReplace(updateEntity);
+
+            // Execute the insert operation.
+            table.Execute(updateOperation);
+
+            return StatusCode(HttpStatusCode.NoContent);
+        }
 
         // TODO DELETE
 
