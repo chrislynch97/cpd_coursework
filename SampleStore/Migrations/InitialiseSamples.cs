@@ -29,8 +29,8 @@ namespace SampleStore.Migrations
 
                 // Create a sample entity and add it to the table.
                 SampleEntity sample1 = new SampleEntity(partitionName, "1");
-                sample1.Title = "Sample 1 Title";
-                sample1.Artist = "Sample 1 Artist";
+                sample1.Title = "Aqualung";
+                sample1.Artist = "Jethro Tull";
                 sample1.CreatedDate = DateTime.Now;
                 sample1.Mp3Blob = null;
                 sample1.SampleMp3Blob = null;
@@ -39,8 +39,8 @@ namespace SampleStore.Migrations
 
                 // Create a sample entity and add it to the table.
                 SampleEntity sample2 = new SampleEntity(partitionName, "2");
-                sample2.Title = "Sample 2 Title";
-                sample2.Artist = "Sample 2 Artist";
+                sample2.Title = "Songs from the Wood";
+                sample2.Artist = "Jethro Tull";
                 sample2.CreatedDate = DateTime.Now;
                 sample2.Mp3Blob = null;
                 sample2.SampleMp3Blob = null;
@@ -49,8 +49,8 @@ namespace SampleStore.Migrations
 
                 // Create a sample entity and add it to the table.
                 SampleEntity sample3 = new SampleEntity(partitionName, "3");
-                sample3.Title = "Sample 3 Title";
-                sample3.Artist = "Sample 3 Artist";
+                sample3.Title = "Wish You Were Here";
+                sample3.Artist = "Pink Floyd";
                 sample3.CreatedDate = DateTime.Now;
                 sample3.Mp3Blob = null;
                 sample3.SampleMp3Blob = null;
@@ -59,8 +59,8 @@ namespace SampleStore.Migrations
 
                 // Create a sample entity and add it to the table.
                 SampleEntity sample4 = new SampleEntity(partitionName, "4");
-                sample4.Title = "Sample 4 Title";
-                sample4.Artist = "Sample 4 Artist";
+                sample4.Title = "Still Life";
+                sample4.Artist = "Van der Graaf Generator";
                 sample4.CreatedDate = DateTime.Now;
                 sample4.Mp3Blob = null;
                 sample4.SampleMp3Blob = null;
@@ -69,8 +69,8 @@ namespace SampleStore.Migrations
 
                 // Create a sample entity and add it to the table.
                 SampleEntity sample5 = new SampleEntity(partitionName, "5");
-                sample5.Title = "Sample 5 Title";
-                sample5.Artist = "Sample 5 Artist";
+                sample5.Title = "Musical Box";
+                sample5.Artist = "Genesis";
                 sample5.CreatedDate = DateTime.Now;
                 sample5.Mp3Blob = null;
                 sample5.SampleMp3Blob = null;
@@ -79,13 +79,33 @@ namespace SampleStore.Migrations
 
                 // Create a sample entity and add it to the table.
                 SampleEntity sample6 = new SampleEntity(partitionName, "6");
-                sample6.Title = "Sample 6 Title";
-                sample6.Artist = "Sample 6 Artist";
+                sample6.Title = "Supper's Ready";
+                sample6.Artist = "Genesis";
                 sample6.CreatedDate = DateTime.Now;
                 sample6.Mp3Blob = null;
                 sample6.SampleMp3Blob = null;
                 sample6.SampleMp3URL = null;
                 sample6.SampleDate = null;
+
+                // Create a sample entity and add it to the table.
+                SampleEntity sample7 = new SampleEntity(partitionName, "7");
+                sample7.Title = "Starship Trooper";
+                sample7.Artist = "Yes";
+                sample7.CreatedDate = DateTime.Now;
+                sample7.Mp3Blob = null;
+                sample7.SampleMp3Blob = null;
+                sample7.SampleMp3URL = null;
+                sample7.SampleDate = null;
+
+                // Create a sample entity and add it to the table.
+                SampleEntity sample8 = new SampleEntity(partitionName, "8");
+                sample8.Title = "Levitation";
+                sample8.Artist = "Hawkwind";
+                sample8.CreatedDate = DateTime.Now;
+                sample8.Mp3Blob = null;
+                sample8.SampleMp3Blob = null;
+                sample8.SampleMp3URL = null;
+                sample8.SampleDate = null;
 
                 // Add sample entities to the batch insert operation.
                 batchOperation.Insert(sample1);
@@ -94,6 +114,8 @@ namespace SampleStore.Migrations
                 batchOperation.Insert(sample4);
                 batchOperation.Insert(sample5);
                 batchOperation.Insert(sample6);
+                batchOperation.Insert(sample7);
+                batchOperation.Insert(sample8);
 
                 // Execute the batch operation.
                 table.ExecuteBatch(batchOperation);
