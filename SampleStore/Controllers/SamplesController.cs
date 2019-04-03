@@ -86,7 +86,7 @@ namespace SampleStore.Controllers
         /// <param name="sample"></param>
         /// <returns></returns>
         [ResponseType(typeof(Sample))]
-        public IHttpActionResult PostSamplel(Sample sample)
+        public IHttpActionResult PostSample(Sample sample)
         {
             SampleEntity sampleEntity = new SampleEntity()
             {
@@ -149,7 +149,32 @@ namespace SampleStore.Controllers
             return StatusCode(HttpStatusCode.NoContent);
         }
 
-        // TODO DELETE
+        // DELETE: api/Samples/5
+        /// <summary>
+        /// Delete a sample
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [ResponseType(typeof(Sample))]
+        public IHttpActionResult DeleteSample(string id)
+        {
+            // Create a retrieve operation that takes a sample entity.
+            TableOperation retrieveOperation = TableOperation.Retrieve<SampleEntity>(partitionName, id);
+
+            // Execute the retrieve operation.
+            TableResult retrievedResult = table.Execute(retrieveOperation);
+            if (retrievedResult.Result == null) return NotFound();
+            else
+            {
+                SampleEntity deleteEntity = (SampleEntity)retrievedResult.Result;
+                TableOperation deleteOperation = TableOperation.Delete(deleteEntity);
+
+                // Execute the operation.
+                table.Execute(deleteOperation);
+
+                return Ok(retrievedResult.Result);
+            }
+        }
 
         private String getNewMaxRowKeyValue()
         {
