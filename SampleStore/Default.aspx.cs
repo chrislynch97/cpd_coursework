@@ -1,8 +1,13 @@
-﻿using Microsoft.WindowsAzure.Storage.Blob;
+﻿using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.WindowsAzure.Storage.Table;
+using SampleStore.Models;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
+using System.Web.Script.Serialization;
 
 // Remember: code behind is run at the server.
 
@@ -13,6 +18,17 @@ namespace SampleStore
         // accessor variables and methods for blob containers and queues
         private BlobStorageService _blobStorageService = new BlobStorageService();
         private CloudQueueService _queueStorageService = new CloudQueueService();
+
+        private CloudStorageAccount storageAccount;
+        private CloudTableClient tableClient;
+        private CloudTable table;
+
+        public _Default()
+        {
+            storageAccount = CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ToString());
+            tableClient = storageAccount.CreateCloudTableClient();
+            table = tableClient.GetTableReference("Samples");
+        }
 
         private CloudBlobContainer getSampleGalleryContainer()
         {
@@ -84,7 +100,18 @@ namespace SampleStore
                 //message.SetMessageContent(System.Text.Encoding.UTF8.GetBytes(name));
                 //getSampleMakerQueue().AddMessage(message);
 
-                //getSampleMakerQueue().AddMessage(new CloudQueueMessage(System.Text.Encoding.UTF8.GetBytes(name)));
+                const String partitionName = "Samples_Partition_1";
+
+                TableQuery<SampleEntity> query = new TableQuery<SampleEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionName));
+
+                List<SampleEntity> entityList = new List<SampleEntity>(table.ExecuteQuery(query));
+                SampleEntity entity = entityList[entityList.Count - 1];
+
+                entity.Mp3Blob = name;
+
+                var message = new JavaScriptSerializer().Serialize(entity);
+
+                getSampleMakerQueue().AddMessage(new CloudQueueMessage(System.Text.Encoding.UTF8.GetBytes(message)));
 
                 System.Diagnostics.Trace.WriteLine(String.Format("*** WebRole: Enqueued '{0}'", path));
             }
