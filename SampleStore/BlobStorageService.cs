@@ -16,7 +16,7 @@ namespace SampleStore
             CloudBlobContainer blobContainer = blobClient.GetContainerReference("audiosamplegallery");
             if (blobContainer.CreateIfNotExists())
             {
-                // Enable public access on the newly created "samplegallery" container.
+                // Enable public access on the newly created "audiosamplegallery" container.
                 blobContainer.SetPermissions(
                     new BlobContainerPermissions
                     {

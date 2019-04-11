@@ -87,78 +87,78 @@ namespace SampleStore.Controllers
             }
         }
 
-        //// POST: api/Samples
-        ///// <summary>
-        ///// Create a new sample
-        ///// </summary>
-        ///// <param name="sample"></param>
-        ///// <returns></returns>
-        //[ResponseType(typeof(Sample))]
-        //public IHttpActionResult PostSample(Sample sample)
-        //{
-        //    SampleEntity sampleEntity = new SampleEntity()
-        //    {
-        //        RowKey = getNewMaxRowKeyValue(),
-        //        PartitionKey = partitionName,
-        //        Title = sample.Title,
-        //        Artist = sample.Artist,
-        //        CreatedDate = DateTime.Now,
-        //        Mp3Blob = null,
-        //        SampleMp3Blob = null,
-        //        SampleMp3URL = sample.SampleMp3URL,
-        //        SampleDate = null
-        //    };
+        // POST: api/Samples
+        /// <summary>
+        /// Create a new sample
+        /// </summary>
+        /// <param name="sample"></param>
+        /// <returns></returns>
+        [ResponseType(typeof(Sample))]
+        public IHttpActionResult PostSample(Sample sample)
+        {
+            SampleEntity sampleEntity = new SampleEntity()
+            {
+                RowKey = getNewMaxRowKeyValue(),
+                PartitionKey = partitionName,
+                Title = sample.Title,
+                Artist = sample.Artist,
+                CreatedDate = DateTime.Now,
+                Mp3Blob = null,
+                SampleMp3Blob = null,
+                SampleMp3URL = sample.SampleMp3URL,
+                SampleDate = null
+            };
 
-        //    // Create the TableOperation that inserts the sample entity.
-        //    var insertOperation = TableOperation.Insert(sampleEntity);
+            // Create the TableOperation that inserts the sample entity.
+            var insertOperation = TableOperation.Insert(sampleEntity);
 
-        //    // Execute the insert operation.
-        //    table.Execute(insertOperation);
+            // Execute the insert operation.
+            table.Execute(insertOperation);
 
-        //    return CreatedAtRoute("DefaultApi", new { id = sampleEntity.RowKey }, sampleEntity);
-        //}
+            return CreatedAtRoute("DefaultApi", new { id = sampleEntity.RowKey }, sampleEntity);
+        }
 
-        //// PUT: api/Samples/5
-        ///// <summary>
-        ///// Update a sample
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <param name="sample"></param>
-        ///// <returns></returns>
-        //[ResponseType(typeof(void))]
-        //public IHttpActionResult PutSample(string id, Sample sample)
-        //{
-        //    if (id != sample.SampleID)
-        //    {
-        //        return BadRequest();
-        //    }
+        // PUT: api/Samples/5
+        /// <summary>
+        /// Update a sample
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="sample"></param>
+        /// <returns></returns>
+        [ResponseType(typeof(void))]
+        public IHttpActionResult PutSample(string id, Sample sample)
+        {
+            if (id != sample.SampleID)
+            {
+                return BadRequest();
+            }
 
-        //    // Create a retrieve operation that takes a sample entity.
-        //    TableOperation retrieveOperation = TableOperation.Retrieve<SampleEntity>(partitionName, id);
+            // Create a retrieve operation that takes a sample entity.
+            TableOperation retrieveOperation = TableOperation.Retrieve<SampleEntity>(partitionName, id);
 
-        //    // Execute the operation.
-        //    TableResult retrievedResult = table.Execute(retrieveOperation);
+            // Execute the operation.
+            TableResult retrievedResult = table.Execute(retrieveOperation);
 
-        //    // Assign the result to a SampleEntity object.
-        //    SampleEntity updateEntity = (SampleEntity)retrievedResult.Result;
+            // Assign the result to a SampleEntity object.
+            SampleEntity updateEntity = (SampleEntity)retrievedResult.Result;
 
-        //    // Get rid of any old blobs
-        //    deleteOldBlobs(updateEntity);
+            // Get rid of any old blobs
+            updateEntity = deleteOldBlobs(updateEntity);
 
-        //    updateEntity.Title = sample.Title;
-        //    updateEntity.Artist = sample.Artist;
-        //    updateEntity.SampleMp3URL = sample.SampleMp3URL;
+            updateEntity.Title = sample.Title;
+            updateEntity.Artist = sample.Artist;
+            updateEntity.SampleMp3URL = sample.SampleMp3URL;
 
-        //    // Create the TableOperation that inserts the sample entity.
-        //    // Note semantics of InsertOrReplace() which are consistent with PUT
-        //    // See: https://stackoverflow.com/questions/14685907/difference-between-insert-or-merge-entity-and-insert-or-replace-entity
-        //    var updateOperation = TableOperation.InsertOrReplace(updateEntity);
+            // Create the TableOperation that inserts the sample entity.
+            // Note semantics of InsertOrReplace() which are consistent with PUT
+            // See: https://stackoverflow.com/questions/14685907/difference-between-insert-or-merge-entity-and-insert-or-replace-entity
+            var updateOperation = TableOperation.InsertOrReplace(updateEntity);
 
-        //    // Execute the insert operation.
-        //    table.Execute(updateOperation);
+            // Execute the insert operation.
+            table.Execute(updateOperation);
 
-        //    return StatusCode(HttpStatusCode.NoContent);
-        //}
+            return StatusCode(HttpStatusCode.NoContent);
+        }
 
         // DELETE: api/Samples/5
         /// <summary>
