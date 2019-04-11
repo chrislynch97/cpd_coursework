@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
 using SampleStore.Models;
 using System;
@@ -19,11 +20,18 @@ namespace SampleStore.Controllers
         private CloudTableClient tableClient;
         private CloudTable table;
 
+        private BlobStorageService _blobStorageService = new BlobStorageService();
+
         public SamplesController()
         {
             storageAccount = CloudStorageAccount.Parse(ConfigurationManager.ConnectionStrings["AzureWebJobsStorage"].ToString());
             tableClient = storageAccount.CreateCloudTableClient();
             table = tableClient.GetTableReference("Samples");
+        }
+
+        private CloudBlobContainer getAudioSampleGalleryContainer()
+        {
+            return _blobStorageService.getCloudBlobContainer();
         }
 
         /// <summary>
@@ -79,78 +87,78 @@ namespace SampleStore.Controllers
             }
         }
 
-        // POST: api/Samples
-        /// <summary>
-        /// Create a new sample
-        /// </summary>
-        /// <param name="sample"></param>
-        /// <returns></returns>
-        [ResponseType(typeof(Sample))]
-        public IHttpActionResult PostSample(Sample sample)
-        {
-            SampleEntity sampleEntity = new SampleEntity()
-            {
-                RowKey = getNewMaxRowKeyValue(),
-                PartitionKey = partitionName,
-                Title = sample.Title,
-                Artist = sample.Artist,
-                CreatedDate = DateTime.Now,
-                Mp3Blob = null,
-                SampleMp3Blob = null,
-                SampleMp3URL = sample.SampleMp3URL,
-                SampleDate = null
-            };
+        //// POST: api/Samples
+        ///// <summary>
+        ///// Create a new sample
+        ///// </summary>
+        ///// <param name="sample"></param>
+        ///// <returns></returns>
+        //[ResponseType(typeof(Sample))]
+        //public IHttpActionResult PostSample(Sample sample)
+        //{
+        //    SampleEntity sampleEntity = new SampleEntity()
+        //    {
+        //        RowKey = getNewMaxRowKeyValue(),
+        //        PartitionKey = partitionName,
+        //        Title = sample.Title,
+        //        Artist = sample.Artist,
+        //        CreatedDate = DateTime.Now,
+        //        Mp3Blob = null,
+        //        SampleMp3Blob = null,
+        //        SampleMp3URL = sample.SampleMp3URL,
+        //        SampleDate = null
+        //    };
 
-            // Create the TableOperation that inserts the sample entity.
-            var insertOperation = TableOperation.Insert(sampleEntity);
+        //    // Create the TableOperation that inserts the sample entity.
+        //    var insertOperation = TableOperation.Insert(sampleEntity);
 
-            // Execute the insert operation.
-            table.Execute(insertOperation);
+        //    // Execute the insert operation.
+        //    table.Execute(insertOperation);
 
-            return CreatedAtRoute("DefaultApi", new { id = sampleEntity.RowKey }, sampleEntity);
-        }
+        //    return CreatedAtRoute("DefaultApi", new { id = sampleEntity.RowKey }, sampleEntity);
+        //}
 
-        // PUT: api/Samples/5
-        /// <summary>
-        /// Update a sample
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="sample"></param>
-        /// <returns></returns>
-        [ResponseType(typeof(void))]
-        public IHttpActionResult PutSample(string id, Sample sample)
-        {
-            if (id != sample.SampleID)
-            {
-                return BadRequest();
-            }
+        //// PUT: api/Samples/5
+        ///// <summary>
+        ///// Update a sample
+        ///// </summary>
+        ///// <param name="id"></param>
+        ///// <param name="sample"></param>
+        ///// <returns></returns>
+        //[ResponseType(typeof(void))]
+        //public IHttpActionResult PutSample(string id, Sample sample)
+        //{
+        //    if (id != sample.SampleID)
+        //    {
+        //        return BadRequest();
+        //    }
 
-            // Create a retrieve operation that takes a sample entity.
-            TableOperation retrieveOperation = TableOperation.Retrieve<SampleEntity>(partitionName, id);
+        //    // Create a retrieve operation that takes a sample entity.
+        //    TableOperation retrieveOperation = TableOperation.Retrieve<SampleEntity>(partitionName, id);
 
-            // Execute the operation.
-            TableResult retrievedResult = table.Execute(retrieveOperation);
+        //    // Execute the operation.
+        //    TableResult retrievedResult = table.Execute(retrieveOperation);
 
-            // Assign the result to a SampleEntity object.
-            SampleEntity updateEntity = (SampleEntity)retrievedResult.Result;
+        //    // Assign the result to a SampleEntity object.
+        //    SampleEntity updateEntity = (SampleEntity)retrievedResult.Result;
 
-            // Get rid of any old blobs
-            deleteOldBlobs(updateEntity);
+        //    // Get rid of any old blobs
+        //    deleteOldBlobs(updateEntity);
 
-            updateEntity.Title = sample.Title;
-            updateEntity.Artist = sample.Artist;
-            updateEntity.SampleMp3URL = sample.SampleMp3URL;
+        //    updateEntity.Title = sample.Title;
+        //    updateEntity.Artist = sample.Artist;
+        //    updateEntity.SampleMp3URL = sample.SampleMp3URL;
 
-            // Create the TableOperation that inserts the sample entity.
-            // Note semantics of InsertOrReplace() which are consistent with PUT
-            // See: https://stackoverflow.com/questions/14685907/difference-between-insert-or-merge-entity-and-insert-or-replace-entity
-            var updateOperation = TableOperation.InsertOrReplace(updateEntity);
+        //    // Create the TableOperation that inserts the sample entity.
+        //    // Note semantics of InsertOrReplace() which are consistent with PUT
+        //    // See: https://stackoverflow.com/questions/14685907/difference-between-insert-or-merge-entity-and-insert-or-replace-entity
+        //    var updateOperation = TableOperation.InsertOrReplace(updateEntity);
 
-            // Execute the insert operation.
-            table.Execute(updateOperation);
+        //    // Execute the insert operation.
+        //    table.Execute(updateOperation);
 
-            return StatusCode(HttpStatusCode.NoContent);
-        }
+        //    return StatusCode(HttpStatusCode.NoContent);
+        //}
 
         // DELETE: api/Samples/5
         /// <summary>
@@ -175,6 +183,9 @@ namespace SampleStore.Controllers
                 // Execute the operation.
                 table.Execute(deleteOperation);
 
+                // get rid of old blobs
+                deleteOldBlobs(deleteEntity);
+
                 return Ok(retrievedResult.Result);
             }
         }
@@ -193,20 +204,27 @@ namespace SampleStore.Controllers
             return maxRowKeyValue.ToString();
         }
 
-        private void deleteOldBlobs(SampleEntity sampleEntity)
+        private SampleEntity deleteOldBlobs(SampleEntity sampleEntity)
         {
-            /*
-             * if sampleEntity has sample blob associated
-             *      delete sample blob
-             *      sampleEntity.SampleMp3Blob = null
-             *      sampleEntity.SampleMp3URL = null
-             *      sampleEntity.SampleDate = null
-             * 
-             * if sampleEntity has mp3 blob associated
-             *      delete mp3 blob
-             *      sampleEntity.Mp3Blob = null
-             *      
-             */
+            if (sampleEntity.Mp3Blob != null)
+            {
+                var blob = getAudioSampleGalleryContainer().GetBlockBlobReference("mp3s/" + sampleEntity.Mp3Blob);
+                blob.DeleteIfExists();
+
+                sampleEntity.Mp3Blob = null;
+            }
+
+            if (sampleEntity.SampleMp3Blob != null)
+            {
+                var blob = getAudioSampleGalleryContainer().GetBlockBlobReference("samples/" + sampleEntity.SampleMp3Blob);
+                blob.DeleteIfExists();
+
+                sampleEntity.SampleMp3Blob = null;
+                sampleEntity.SampleMp3URL = null;
+                sampleEntity.SampleDate = null;
+            }
+
+            return sampleEntity;
         }
 
     }

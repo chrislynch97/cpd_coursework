@@ -13,7 +13,7 @@ namespace SampleStore
 
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
-            CloudBlobContainer blobContainer = blobClient.GetContainerReference("samplegallery");
+            CloudBlobContainer blobContainer = blobClient.GetContainerReference("audiosamplegallery");
             if (blobContainer.CreateIfNotExists())
             {
                 // Enable public access on the newly created "samplegallery" container.
