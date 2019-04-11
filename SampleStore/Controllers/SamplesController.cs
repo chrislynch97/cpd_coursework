@@ -134,6 +134,9 @@ namespace SampleStore.Controllers
             // Assign the result to a SampleEntity object.
             SampleEntity updateEntity = (SampleEntity)retrievedResult.Result;
 
+            // Get rid of any old blobs
+            deleteOldBlobs(updateEntity);
+
             updateEntity.Title = sample.Title;
             updateEntity.Artist = sample.Artist;
             updateEntity.SampleMp3URL = sample.SampleMp3URL;
@@ -188,6 +191,22 @@ namespace SampleStore.Controllers
             }
             maxRowKeyValue++;
             return maxRowKeyValue.ToString();
+        }
+
+        private void deleteOldBlobs(SampleEntity sampleEntity)
+        {
+            /*
+             * if sampleEntity has sample blob associated
+             *      delete sample blob
+             *      sampleEntity.SampleMp3Blob = null
+             *      sampleEntity.SampleMp3URL = null
+             *      sampleEntity.SampleDate = null
+             * 
+             * if sampleEntity has mp3 blob associated
+             *      delete mp3 blob
+             *      sampleEntity.Mp3Blob = null
+             *      
+             */
         }
 
     }
