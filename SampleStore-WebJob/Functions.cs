@@ -15,33 +15,6 @@ namespace SampleStore_WebJob
         // This class contains the application-specific WebJob code consisting of event-driven
         // methods executed when messages appear in queues with any supporting code.
 
-        // Trigger method  - run when new message detected in queue. "samplemaker" is name of queue.
-        // "samplegallery" is name of storage container; "mp3s" and "samples" are folder names. 
-        // "{queueTrigger}" is an inbuilt variable taking on value of contents of message automatically;
-        // the other variables are valued automatically.
-        //public static void GenerateSample(
-        //[QueueTrigger("samplemaker")] String blobInfo,
-        //[Blob("samplegallery/mp3s/{queueTrigger}")] CloudBlockBlob inputBlob,
-        //[Blob("samplegallery/samples/{queueTrigger}")] CloudBlockBlob outputBlob, TextWriter logger)
-        //{
-        //    inputBlob.FetchAttributes();
-
-        //    //use log.WriteLine() rather than Console.WriteLine() for trace output
-        //    logger.WriteLine("GenerateSample() started...");
-        //    logger.WriteLine("Input blob is: " + blobInfo);
-
-        //    // Open streams to blobs for reading and writing as appropriate.
-        //    // Pass references to application specific methods
-        //    using (Stream input = inputBlob.OpenRead())
-        //    using (Stream output = outputBlob.OpenWrite())
-        //    {
-        //        CreateSample(input, output, 20);
-        //        outputBlob.Properties.ContentType = "audio/mpeg3";
-        //        outputBlob.Metadata.Add("Title", inputBlob.Metadata["Title"]);
-        //    }
-        //    logger.WriteLine("GenerateSample() completed...");
-        //}
-
         public static void GenerateSample(
         [QueueTrigger("audiosamplemaker")] SampleEntity sampleInQueue,
         [Blob("audiosamplegallery/mp3s/{Mp3Blob}")] CloudBlockBlob inputBlob,
@@ -65,10 +38,11 @@ namespace SampleStore_WebJob
             sampleInTable.Mp3Blob = sampleInQueue.Mp3Blob;
             sampleInTable.SampleMp3Blob = sampleInQueue.Mp3Blob;
             sampleInTable.SampleDate = DateTime.Now;
-            //sampleInTable.SampleMp3URL = "URL";
-            sampleInTable.SampleMp3URL = outputBlob.Uri.AbsolutePath;
+            sampleInTable.SampleMp3URL = "http://127.0.0.1:10000" + outputBlob.Uri.AbsolutePath;
+            //sampleInTable.SampleMp3URL = "https://clstor050319.blob.core.windows.net" + outputBlob.Uri.AbsolutePath;
 
             TableOperation updateOperation = TableOperation.InsertOrReplace(sampleInTable);
+            tableBinding.Execute(updateOperation);
 
             logger.WriteLine("GenerateSample() completed...");
         }
