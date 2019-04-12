@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="AzureStorage-Web.config Connection String" description="AzureStorage Connection String used in web.config by the application to access the database." defaultValue="DefaultEndpointsProtocol=https;AccountName=clstor120419;AccountKey=LWgPd/BqeRMduZOuzEAMQbap+/DBntGOVy+DTnNU90Jyd5HkafZVMt3NXNikUPKVIK5dDr+auw5UO852f3oHCg==;EndpointSuffix=core.windows.net" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\chris\\Documents\\Visual\ Studio\ 2015\\Projects\\SampleStore\\SampleStore\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='AzureStorage']/@connectionString" />
+  </parameter>
+  <parameter name="AzureWebJobsDashboard-Web.config Connection String" description="AzureWebJobsDashboard Connection String used in web.config by the application to access the database." defaultValue="DefaultEndpointsProtocol=https;AccountName=clstor120419;AccountKey=LWgPd/BqeRMduZOuzEAMQbap+/DBntGOVy+DTnNU90Jyd5HkafZVMt3NXNikUPKVIK5dDr+auw5UO852f3oHCg==;EndpointSuffix=core.windows.net" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\chris\\Documents\\Visual\ Studio\ 2015\\Projects\\SampleStore\\SampleStore\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='AzureWebJobsDashboard']/@connectionString" />
+  </parameter>
+  <parameter name="AzureWebJobsStorage-Web.config Connection String" description="AzureWebJobsStorage Connection String used in web.config by the application to access the database." defaultValue="DefaultEndpointsProtocol=https;AccountName=clstor120419;AccountKey=LWgPd/BqeRMduZOuzEAMQbap+/DBntGOVy+DTnNU90Jyd5HkafZVMt3NXNikUPKVIK5dDr+auw5UO852f3oHCg==;EndpointSuffix=core.windows.net" tags="SqlConnectionString">
+    <parameterEntry kind="XmlFile" scope="C:\\Users\\chris\\Documents\\Visual\ Studio\ 2015\\Projects\\SampleStore\\SampleStore\\obj\\Release\\Package\\PackageTmp\\Web\.config$" match="/configuration/connectionStrings/add[@name='AzureWebJobsStorage']/@connectionString" />
+  </parameter>
+</parameters>

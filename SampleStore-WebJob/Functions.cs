@@ -38,8 +38,12 @@ namespace SampleStore_WebJob
             sampleInTable.Mp3Blob = sampleInQueue.Mp3Blob;
             sampleInTable.SampleMp3Blob = sampleInQueue.Mp3Blob;
             sampleInTable.SampleDate = DateTime.Now;
+
+            // for local
             sampleInTable.SampleMp3URL = "http://127.0.0.1:10000" + outputBlob.Uri.AbsolutePath;
-            //sampleInTable.SampleMp3URL = "https://clstor050319.blob.core.windows.net" + outputBlob.Uri.AbsolutePath;
+
+            // for cloud
+            //sampleInTable.SampleMp3URL = "https://clstor120419.blob.core.windows.net" + outputBlob.Uri.AbsolutePath;
 
             TableOperation updateOperation = TableOperation.InsertOrReplace(sampleInTable);
             tableBinding.Execute(updateOperation);

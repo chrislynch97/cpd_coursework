@@ -44,7 +44,7 @@ namespace SampleStore.Controllers
             TableQuery<SampleEntity> query = new TableQuery<SampleEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionName));
             List<SampleEntity> entityList = new List<SampleEntity>(table.ExecuteQuery(query));
 
-            // Basically create a list of Sample from the list of SampleEntity with a 1:1 object relationship, filtering data as needed
+            // Create a list of Sample from the list of SampleEntity with a 1:1 object relationship, filtering data as needed
             IEnumerable<Sample> sampleList = from e in entityList
                                                select new Sample()
                                                {
@@ -204,6 +204,8 @@ namespace SampleStore.Controllers
             return maxRowKeyValue.ToString();
         }
 
+        // check if the sampleEntity has Mp3Blob or SampleMp3Blob associated
+        // if so then delete them from storage and update and return the sampleEntity
         private SampleEntity deleteOldBlobs(SampleEntity sampleEntity)
         {
             if (sampleEntity.Mp3Blob != null)

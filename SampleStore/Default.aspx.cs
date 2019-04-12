@@ -73,13 +73,9 @@ namespace SampleStore
                 // within all the files in that blob container
                 var name = string.Format("{0}{1}", Guid.NewGuid(), ext);
 
-                // Upload mp3 to the cloud. Store it in a new 
-                // blob in the specified blob container. 
-
                 // Go to the container, instantiate a new blob
                 // with the descriptive name
                 String path = "mp3s/" + name;
-
                 var blob = getSampleGalleryContainer().GetBlockBlobReference(path);
 
                 // The blob properties object (the label on the bucket)
@@ -94,16 +90,13 @@ namespace SampleStore
                 blob.UploadFromStream(upload.FileContent);
 
                 // Place a message in the queue to tell the worker
-                // role that a new mp3 blob exists, which will 
-                // cause it to create a sample blob of that mp3
-                //var message = new CloudQueueMessage(upload.FileName, "123");
-                //message.SetMessageContent(System.Text.Encoding.UTF8.GetBytes(name));
-                //getSampleMakerQueue().AddMessage(message);
+                // role that a new mp3 blob exists
 
+                // get the all SampleEntities from the SampleTable
+                // get the most recently added SampleEntity using Count-1
+                // add Mp3Blob to this entity and add it to the Queue for the WebJob
                 const String partitionName = "Samples_Partition_1";
-
                 TableQuery<SampleEntity> query = new TableQuery<SampleEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionName));
-
                 List<SampleEntity> entityList = new List<SampleEntity>(table.ExecuteQuery(query));
                 SampleEntity entity = entityList[entityList.Count - 1];
 
