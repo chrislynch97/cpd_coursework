@@ -44,29 +44,29 @@ namespace SampleStore_WebJob
 
         public static void GenerateSample(
         [QueueTrigger("audiosamplemaker")] SampleEntity sampleInQueue,
+        [Blob("audiosamplegallery/mp3s/{Mp3Blob}")] CloudBlockBlob inputBlob,
+        [Blob("audiosamplegallery/samples/{Mp3Blob}")] CloudBlockBlob outputBlob,
         [Table("Samples", "{PartitionKey}", "{RowKey}")] SampleEntity sampleInTable,
         [Table("Samples")] CloudTable tableBinding, TextWriter logger)
         {
             //use log.WriteLine() rather than Console.WriteLine() for trace output
             logger.WriteLine("GenerateSample() started...");
 
-            //var inputBlob = getSampleGalleryContainer().GetBlockBlobReference("mp3/" + sampleInQueue.Mp3Blob);
-            //var outputBlob = getSampleGalleryContainer().GetBlockBlobReference("samples/" + sampleInQueue.Mp3Blob);
-
-            //// Open streams to blobs for reading and writing as appropriate.
-            //// Pass references to application specific methods
-            //using (Stream input = inputBlob.OpenRead())
-            //using (Stream output = outputBlob.OpenWrite())
-            //{
-            //    CreateSample(input, output, 20);
-            //    outputBlob.Properties.ContentType = "audio/mpeg3";
-            //    outputBlob.Metadata.Add("Title", inputBlob.Metadata["Title"]);
-            //}
+            // Open streams to blobs for reading and writing as appropriate.
+            // Pass references to application specific methods
+            using (Stream input = inputBlob.OpenRead())
+            using (Stream output = outputBlob.OpenWrite())
+            {
+                CreateSample(input, output, 20);
+                outputBlob.Properties.ContentType = "audio/mpeg3";
+                outputBlob.Metadata.Add("Title", inputBlob.Metadata["Title"]);
+            }
 
             sampleInTable.Mp3Blob = sampleInQueue.Mp3Blob;
-            //sampleInTable.SampleMp3Blob = sampleInQueue.Mp3Blob;
-            //sampleInTable.SampleDate = DateTime.Now;
+            sampleInTable.SampleMp3Blob = sampleInQueue.Mp3Blob;
+            sampleInTable.SampleDate = DateTime.Now;
             //sampleInTable.SampleMp3URL = "URL";
+            sampleInTable.SampleMp3URL = outputBlob.Uri.AbsolutePath;
 
             TableOperation updateOperation = TableOperation.InsertOrReplace(sampleInTable);
 
